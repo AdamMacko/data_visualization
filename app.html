@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>App</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+
+<body>
+
+<header>
+
+<div id="menu-panel">
+  <h3>Ovládaci Panel</h3>
+  <button id="btn-add-circle">Pridať bod</button>
+  <button id="btn-update-circle">Upraviť bod</button>
+  <button id="btn-delete-circle">Odstrániť bod</button>
+  <button id="btn-reset-map">Resetovať mapu</button>
+  <button id="btn-upload-map">Nahrať pôdorys</button>
+  <input type="file" id="floorplan-upload" accept="image/*" style="display: none;">
+  <button id="btn-change-floor">Zmeniť poschodie</button>
+  <button id="btn-upload-csv">Nahrať CSV</button>
+</div>
+
+</header>
+
+<main>
+<div id="mapContainer">
+
+  <div id="zoomControls">
+    <button onclick="zoomIn()">+</button>
+    <button onclick="zoomOut()">-</button>
+    <button onclick="resetZoom()">Resetovať</button>
+  </div>
+
+  <svg id="floorplan" width="1100" height="600">
+    <g id="zoomGroup">
+      <image href="images/2NP.png" x="0" y="0" width="1100" height="600" preserveAspectRatio="none"></image>
+    </g>
+  </svg>
+</div>
+</main>
+
+<footer>
+
+</footer>
+
+
+<script src="script.js"></script>
+</body>
+
+</html>
