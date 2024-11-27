@@ -62,7 +62,6 @@ svg.on("click", (event) => {
 
     // Ziskanie pozicie mysi
     const [mouseX, mouseY] = d3.pointer(event);
-
     // Prepocet suradnic
     const x = (mouseX - currentTransform.x) / currentTransform.k;
     const y = (mouseY - currentTransform.y) / currentTransform.k;
@@ -81,7 +80,6 @@ svg.on("click", (event) => {
     addCircle.textContent = 'Pridať bod';
     addCircle.classList.remove('active');
 });
-
 
 let isDeletingPoint = false;
 
