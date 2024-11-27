@@ -2,7 +2,7 @@
 const svg = d3.select("#floorplan");
 const mapContainer = document.getElementById('mapContainer');
 const zoomGroup = svg.select("#zoomGroup");
-// Ovládací panel tlačidlá ---------------------------------------
+// Ovladaci panel tlacidla ---------------------------------------
 const addCircle = document.getElementById('btn-add-circle');
 const updateCircle = document.getElementById('btn-update-circle');
 const deleteCircle = document.getElementById('btn-delete-circle');
@@ -14,58 +14,56 @@ const uploadCSV = document.getElementById('btn-upload-csv');
 // ------------------------------------------------------------
 
 
-// Inicializácia premennej na uloženie transformácie zoomu
+// Inicializacia premennej na ulozenie transformácie zoomu
 let currentTransform = d3.zoomIdentity;
 
-// Pole na uloženie súradníc bodov
+// Pole na ulozenie bodov
 let points = [];
 
-// Inicializácia zoomovania
+
 const zoom = d3.zoom()
     .scaleExtent([0.5, 5]) // Min. a max. zoom
     .on("zoom", (event) => {
-        currentTransform = event.transform; // Uloženie aktuálnej transformácie
-        zoomGroup.attr("transform", currentTransform); // Aplikácia transformácie
+        currentTransform = event.transform; 
+        zoomGroup.attr("transform", currentTransform); 
     });
 
-// Aplikácia zoomovania na SVG
+
 svg.call(zoom);
-
-// Funkcia pre priblíženie
+//+
 function zoomIn() {
-    svg.transition().call(zoom.scaleBy, 1.2); // Zvýši mierku o 20%
+    svg.transition().call(zoom.scaleBy, 1.2); 
 }
 
-// Funkcia pre oddialenie
+//-
 function zoomOut() {
-    svg.transition().call(zoom.scaleBy, 0.8); // Zníži mierku o 20%
+    svg.transition().call(zoom.scaleBy, 0.8); 
 }
 
-// Funkcia pre resetovanie zoomu
+//reset
 function resetZoom() {
-    svg.transition().call(zoom.transform, d3.zoomIdentity); // Resetuje zoom
-    currentTransform = d3.zoomIdentity; // Reset transformácie
+    svg.transition().call(zoom.transform, d3.zoomIdentity);
+    currentTransform = d3.zoomIdentity;
 }
 
-// Prepínač pre režim pridávania bodov
 let isAddingPoint = false;
 
 
-// Kliknutie na tlačidlo "Pridať bod"
+// Kliknutie na tlacidlo "Pridat bod"
 addCircle.addEventListener('click', () => {
-    isAddingPoint = !isAddingPoint; // Prepnutie režimu
+    isAddingPoint = !isAddingPoint; 
     addCircle.textContent = isAddingPoint ? 'Zruš pridávanie bodov' : 'Pridať bod';
-    addCircle.classList.toggle('active', isAddingPoint); // Zmena farby tlačidla
+    addCircle.classList.toggle('active', isAddingPoint);
 });
 
 // Kliknutie na SVG mapu pre pridanie bodu
 svg.on("click", (event) => {
     if (!isAddingPoint) return;
 
-    // Získanie pozície myši v rámci SVG
+    // Ziskanie pozicie mysi
     const [mouseX, mouseY] = d3.pointer(event);
 
-    // Prepočet súradníc na zohľadnenie transformácie
+    // Prepocet suradnic
     const x = (mouseX - currentTransform.x) / currentTransform.k;
     const y = (mouseY - currentTransform.y) / currentTransform.k;
 
@@ -73,83 +71,80 @@ svg.on("click", (event) => {
     zoomGroup.append("circle")
         .attr("cx", x)
         .attr("cy", y)
-        .attr("r", 5) // Polomer bodu
+        .attr("r", 5)
         .attr("fill", "red");
 
-        // Uloženie súradníc do poľa
+    // Ulozenie súradníc do pola
     points.push({ x, y });
-    console.log("Pridaný bod:", { x, y }); // Pre kontrolu v konzole
-    // Vypnutie režimu pridávania bodov
+    console.log("Pridaný bod:", { x, y });
     isAddingPoint = false;
     addCircle.textContent = 'Pridať bod';
     addCircle.classList.remove('active');
 });
 
 
-let isDeletingPoint = false; // Režim odstraňovania bodov
+let isDeletingPoint = false;
 
 deleteCircle.addEventListener('click', () => {
-    isDeletingPoint = !isDeletingPoint; // Prepnutie režimu
+    isDeletingPoint = !isDeletingPoint;
     deleteCircle.textContent = isDeletingPoint ? 'Zruš odstraňovanie' : 'Odstrániť bod';
-    deleteCircle.classList.toggle('active', isDeletingPoint); // Zmena farby tlačidla
+    deleteCircle.classList.toggle('active', isDeletingPoint);
 });
 
 svg.on("click", (event) => {
+
     if (!isAddingPoint) return;
 
-    // Získanie pozície myši v rámci SVG
     const [mouseX, mouseY] = d3.pointer(event);
 
-    // Prepočet súradníc na zohľadnenie transformácie
+   
     const x = (mouseX - currentTransform.x) / currentTransform.k;
     const y = (mouseY - currentTransform.y) / currentTransform.k;
 
-    // Pridanie bodu do zoomovacej skupiny
-    const point = { x, y }; // Objekt so súradnicami
+   
+    const point = { x, y };
     zoomGroup.append("circle")
         .attr("cx", x)
         .attr("cy", y)
-        .attr("r", 5) // Polomer bodu
+        .attr("r", 5)
         .attr("fill", "red")
-        .datum(point) // Naviazanie údajov na element
+        .datum(point)
         .on("click", function (event) {
             if (isDeletingPoint) {
-                const index = points.findIndex(p => p.x === point.x && p.y === point.y); // Nájdeme index bodu v poli
-                if (index !== -1) points.splice(index, 1); // Odstránenie z poľa
-                d3.select(this).remove(); // Odstránenie bodu z mapy
-                console.log("Odstránený bod:", point); // Pre kontrolu
+                const index = points.findIndex(p => p.x === point.x && p.y === point.y);
+                if (index !== -1) points.splice(index, 1);
+                d3.select(this).remove();
+                console.log("Odstránený bod:", point);
             }
         });
 
-    // Uloženie súradníc do poľa
-    points.push(point);
-    console.log("Pridaný bod:", point); // Pre kontrolu v konzole
 
-    // Vypnutie režimu pridávania bodov
+    points.push(point);
+    console.log("Pridaný bod:", point);
+
     isAddingPoint = false;
     addCircle.textContent = 'Pridať bod';
     addCircle.classList.remove('active');
 });
 
 
-// Keď klikneš na tlačidlo "Nahrať pôdorys"
+// Vlozenie podorysu
 uploadMapButton.addEventListener('click', () => {
-    fileInput.click(); // Otvorí dialóg na výber súboru
+    fileInput.click();
 });
 
-// Keď používateľ vyberie súbor
+
 fileInput.addEventListener('change', (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
-    // Načítanie obrázka ako URL
+
     const reader = new FileReader();
     reader.onload = (e) => {
         const imageUrl = e.target.result;
 
-        // Nahradenie pozadia SVG mapy
         const floorplanImage = d3.select("#zoomGroup image");
-        floorplanImage.attr("href", imageUrl); // Aktualizuje URL obrázka
+        floorplanImage.attr("href", imageUrl);
     };
-    reader.readAsDataURL(file); // Prečíta obrázok ako Base64 URL
+    reader.readAsDataURL(file);
 });
