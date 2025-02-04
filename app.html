@@ -6,33 +6,94 @@
   <title>App</title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://d3js.org/d3.v7.min.js"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 </head>
 
 <body>
 
 <header>
-
 <div id="menu-panel">
   <h3>Ovládaci Panel</h3>
-  <button id="btn-add-circle">Pridať bod</button>
-  <button id="btn-update-circle">Upraviť bod</button>
-  <button id="btn-delete-circle">Odstrániť bod</button>
-  <button id="btn-reset-map">Resetovať mapu</button>
-  <button id="btn-upload-map">Nahrať pôdorys</button>
+  <button id="btn-add-circle">
+    <span class="material-symbols-outlined">add</span>
+    Pridať bod
+  </button>  
+  <div class="dropdown-container">
+    <button id="btn-update-circle">  
+      <span class="material-symbols-outlined">edit</span>
+      Upraviť bod
+      </button>
+    <div id="edit-point-menu" class="dropdown-menu">
+      <button class="dropdown-item" id="btn-change-color" onclick="openColorPicker()">
+        <span class="material-symbols-outlined">palette</span>
+        Zmeniť farbu
+        <span id="color-swatch" style="display:inline-block; width:20px; height:20px; background:#ff0000; margin-left:auto;"></span>
+      </button>
+      
+      <button class="dropdown-item" onclick="openSizeInput()">
+          <span class="material-symbols-outlined">straighten</span> Zmeniť veľkosť
+      </button>
+      <input type="range" id="sizeSlider" style="display: none; width: 100%;" min="1" max="20" value="5">
+      <button class="dropdown-item" onclick="toggleShape()">
+          <span class="material-symbols-outlined">change_circle</span> Zmeniť tvar
+      </button>
+      <button class="dropdown-item" onclick="enablePositionEdit()">
+          <span class="material-symbols-outlined">open_with</span> Presunúť bod
+      </button>
+    </div>
+  </div>
+
+  <button id="btn-delete-circle">  
+    <span class="material-symbols-outlined">remove</span>
+    Odstrániť bod
+  </button>
+  <button id="btn-reset-map">  
+    <span class="material-symbols-outlined">restart_alt</span>
+    Resetovať mapu
+  </button>
+  <button id="btn-upload-map">  
+    <span class="material-symbols-outlined">upload</span>
+    Nahrať pôdorys
+  </button>
   <input type="file" id="floorplan-upload" accept="image/*" style="display: none;">
   <button id="btn-change-floor">Zmeniť poschodie</button>
   <button id="btn-upload-csv">Nahrať CSV</button>
+  <button id="btn-upload-json">Nahrať JSON</button>
+  <input type="file" id="jsonFileInput" style="display: none;" accept=".json">
+  <button id="btn-upload-txt">Nahrať txt</button>
+  <input type="file" id="txtFileInput" style="display: none;" accept=".txt">
+  <input type="color" id="colorPicker" style="display: none;">
+  
 </div>
-
 </header>
 
 <main>
 <div id="mapContainer">
-
   <div id="zoomControls">
-    <button onclick="zoomIn()">+</button>
-    <button onclick="zoomOut()">-</button>
-    <button onclick="resetZoom()">Resetovať</button>
+    <button onclick="zoomIn()">
+        <span class="material-symbols-outlined">zoom_in</span>
+    </button>
+    <button onclick="zoomOut()">
+        <span class="material-symbols-outlined">zoom_out</span>
+    </button>
+    <button onclick="resetZoom()">
+        <span class="material-symbols-outlined">zoom_out_map</span>
+    </button>
+  </div>
+
+  <div id="animatedPath">
+    <button onclick="stepBack()">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </button>
+    <button onclick="play()">
+        <span class="material-symbols-outlined">play_arrow</span>
+    </button>
+    <button onclick="stop()">
+        <span class="material-symbols-outlined">stop</span>
+    </button>
+    <button onclick="resetZoom()">
+      <span class="material-symbols-outlined">arrow_forward</span>
+    </button>
   </div>
 
   <svg id="floorplan" width="1100" height="600">
@@ -44,11 +105,8 @@
 </main>
 
 <footer>
-
 </footer>
-
 
 <script src="script.js"></script>
 </body>
-
 </html>
