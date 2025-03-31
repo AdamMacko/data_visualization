@@ -6,6 +6,7 @@
   --text-light: #ffffff;
   --text-dark: #333333;
   --button-radius: 8px;
+  --hover-span-color : green;
 }
 
 /* === resetovanie a zakladny styl === */
@@ -18,6 +19,7 @@ body {
   background-color: #000000;
   font-family: 'Roboto', sans-serif;
 }
+
 
 
 .container {
@@ -91,6 +93,10 @@ p {
   transform: translateY(-2px);
 }
 
+#menu-panel button:hover span {
+  color:var( --hover-span-color) ;
+}
+
 #menu-panel button:active {
   transform: translateY(0);
 }
@@ -124,7 +130,7 @@ p {
 #zoomControls {
   position: absolute;
   bottom: 0;
-  right: -90px;
+  right: -70px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -145,6 +151,9 @@ p {
 
 #zoomControls button:hover {
   background-color: var(--primary-hover);
+}
+#zoomControls button:hover span {
+  color:var( --hover-span-color) ;
 }
 
 #animatedPath {
@@ -172,10 +181,14 @@ p {
 #animatedPath button:hover {
   background-color: var(--primary-hover);
 }
+#animatedPath button:hover span {
+  color:var( --hover-span-color) ;
+}
 
 /* === pulzovanie pre body na mape === */
 .pulsating {
   animation: pulse 1.5s infinite;
+  filter: drop-shadow(0 0 2px rgba(242, 255, 0, 0.7));
 }
 
 @keyframes pulse {
@@ -188,11 +201,13 @@ p {
       r: 7px;
       opacity: 0.6;
       fill: rgb(144, 144, 199);
+      filter: drop-shadow(0 0 2px rgba(242, 255, 0, 0.7));
   }
   100% {
       r: 5px;
       opacity: 1;
       fill: rgb(242, 255, 0);
+      filter: drop-shadow(0 0 2px rgba(242, 255, 0, 0.7));
   }
 }
 
@@ -221,7 +236,255 @@ p {
   background: #0056b3;
 }
 
+.dropdown-item:hover span {
+  color:var( --hover-span-color) ;
+}
+
 .show {
   display: flex !important;
+}
+
+#currentFloorIndicator {
+  position: absolute;
+  top: -55px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #7c7c7c, #898989);
+  color: #067bf8;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 20px;
+  font-weight: bold;
+  box-shadow: 0px 2px 2px rgba(0, 191, 255, 0.4);
+  z-index: 20;
+  border: 2px solid rgba(0, 85, 255, 0.8); 
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-family: "Arial", sans-serif;
+}
+
+#speedControl {
+  position: absolute;
+  top: 100%;
+  left: 10%;
+  transform: translate(-50%, 4px);
+  display: flex;
+  gap: 10px;
+  background-color: rgba(175, 175, 175, 0.7);
+  padding: 5px 15px;
+  border-radius: 5px;
+}
+
+#speedControl button {
+  background-color: var(--primary-color);
+  color: var(--text-light);
+  border: none;
+  padding: 10px 11px;
+  border-radius: var(--button-radius);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#speedControl button:hover {
+  background-color: var(--primary-hover);
+}
+#speedControl button:hover span {
+  color:var( --hover-span-color) ;
+}
+
+#currentSpeed {
+  font-size: 16px;
+  color: white;
+  font-weight: bold;
+  min-width: 80px;
+  text-align: center;
+  position: relative;
+  top: 11px;
+  margin-bottom: 0%;
+}
+
+.details-panel {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 250px;
+  background: rgb(147, 147, 147);
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+  display: none; /* Skryté na začiatku */
+}
+
+
+.led-container {
+  display: flex;
+  position: absolute;
+  top: 100%;
+  left: 78%;
+  background-color: rgba(175, 175, 175, 0.7);
+  padding: 5px 15px;
+  border-radius: 5px;
+  gap: 10px;
+  margin-top: 5px; 
+}
+
+.led {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 3px solid #444;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.red { background-color: #330000; }
+.green { background-color: #003300; }
+.blue { background-color: #000033; }
+.yellow { background-color: #333300; }
+
+.on {
+  box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.8);
+}
+
+.on.red { background-color: red; }
+.on.green { background-color: lime; }
+.on.blue { background-color: blue; }
+.on.yellow { background-color: yellow; }
+
+
+.led.active {
+  /* Zmeníme farbu LED po aktivácii */
+  opacity: 1; /* LED bude viditeľná */
+  box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.8); /* Zvýšenie svetla LED */
+}
+
+.led.red.active {
+  background-color: red;
+}
+
+.led.green.active {
+  background-color: lime;
+}
+
+.led.blue.active {
+  background-color: blue;
+}
+
+.led.yellow.active {
+  background-color: yellow;
+}
+
+.shape-options {
+  display: flex;
+  flex-direction: column; /* Usporiadaj tlačidlá pod seba */
+  gap: 5px; /* Medzera medzi tlačidlami */
+  align-items: stretch; /* Natiahne tlačidlá na rovnakú šírku */
+  padding: 5px;
+  background: #a1a1a1;
+  border-radius: 5px;
+  width: fit-content; /* Automatická šírka podľa obsahu */
+}
+
+.shape-btn {
+  display: flex;
+  align-items: center;  /* Zarovná ikonu a text vertikálne */
+  justify-content: flex-start; /* Ikona naľavo, text vedľa nej */
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  width: 100%; /* Tlačidlá budú rovnako široké */
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.shape-btn:hover {
+  background: var(--primary-hover);
+}
+
+/* Štýl pre ikonu v tlačidle */
+.shape-btn span {
+  margin-right: 10px; /* Oddeľuje ikonu od textu */
+  font-size: 18px; /* Veľkosť ikon */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px; /* Pevná šírka pre lepšie zarovnanie */
+}
+.shape-btn:hover span {
+  color:var( --hover-span-color) ;
+} 
+
+#openModal {
+  position: absolute;
+  bottom: 555px;  
+  right: -50px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+  background-color: rgba(175, 175, 175, 0.7);
+  border-radius: 5px;
+  color: var(--text-light);
+  border: none;
+  padding: 10px;
+  border-radius: var(--button-radius);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#openModal:hover {
+  background-color: var(--primary-hover);
+}
+
+#openModal:hover span {
+  color: var(--hover-span-color);
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 2px;
+  position: relative;
+  width: 80%;
+  height: 80%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 10px;
+}
+.chart-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f0f0f0;
+  border-radius: 1px;
+}
+.close {
+  position: absolute;
+  top: 10px; right: 15px;
+  cursor: pointer;
+  font-size: 20px;
+  color: black;
+}
+
+.size-slider {
+  width: 90%;
+  margin: 10px auto;
+  display: block;
 }
 

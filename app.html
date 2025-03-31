@@ -27,17 +27,38 @@
       <button class="dropdown-item" id="btn-change-color" onclick="openColorPicker()">
         <span class="material-symbols-outlined">palette</span>
         Zmeniť farbu
-        <span id="color-swatch" style="display:inline-block; width:20px; height:20px; background:#ff0000; margin-left:auto;"></span>
+        <span id="color-swatch" style="display:inline-block; width:20px; height:20px; background:#fbff00; margin-left:auto;"></span>
       </button>
       
-      <button class="dropdown-item" onclick="openSizeInput()">
-          <span class="material-symbols-outlined">straighten</span> Zmeniť veľkosť
+      <button class="dropdown-item" id="btn-change-size">
+        <span class="material-symbols-outlined">straighten</span> Zmeniť veľkosť
       </button>
-      <input type="range" id="sizeSlider" style="display: none; width: 100%;" min="1" max="20" value="5">
-      <button class="dropdown-item" onclick="toggleShape()">
-          <span class="material-symbols-outlined">change_circle</span> Zmeniť tvar
-      </button>
-      <button class="dropdown-item" onclick="enablePositionEdit()">
+      <input type="range" id="sizeSlider" class="size-slider" min="1" max="20" value="5">
+   
+     
+      <button class="dropdown-item" onclick="toggleShapeMenu()">
+        <span class="material-symbols-outlined">change_circle</span> Zmeniť tvar
+    </button>
+    <div id="shape-options" class="shape-options" style="display: none;">
+        <button class="shape-btn" onclick="changeShape('circle')">
+          <span class="material-symbols-outlined">circle</span>
+          Kruh
+        </button>
+        <button class="shape-btn" onclick="changeShape('triangle')">
+          <span class="material-symbols-outlined">change_history</span>
+          Trojuholník
+        </button>
+        <button class="shape-btn" onclick="changeShape('diamond')">
+          <span class="material-symbols-outlined">stat_0</span>
+          Diamant
+        </button>
+        <button class="shape-btn" onclick="changeShape('star')">
+          <span class="material-symbols-outlined">star</span>
+          Hviezda
+        </button>
+    </div>
+    
+      <button class="dropdown-item">
           <span class="material-symbols-outlined">open_with</span> Presunúť bod
       </button>
     </div>
@@ -56,11 +77,31 @@
     Nahrať pôdorys
   </button>
   <input type="file" id="floorplan-upload" accept="image/*" style="display: none;">
-  <button id="btn-change-floor">Zmeniť poschodie</button>
-  <button id="btn-upload-csv">Nahrať CSV</button>
-  <button id="btn-upload-json">Nahrať JSON</button>
+  
+  <button id="btn-change-floor">  
+    <span class="material-symbols-outlined">layers</span>
+    Zmeniť poschodie
+  </button>
+  
+  <!-- Dropdown menu na výber poschodia -->
+  <div id="floor-menu" class="dropdown-menu" style="display: none;">
+    <button class="dropdown-item" onclick="setFloor(0)">Prízemie</button>
+    <button class="dropdown-item" onclick="setFloor(1)">1. poschodie</button>
+    <button class="dropdown-item" onclick="setFloor(2)">2. poschodie</button>
+    <button class="dropdown-item" onclick="setFloor(3)">3. poschodie</button>
+    <button class="dropdown-item" onclick="setFloor(4)">4. poschodie</button>
+  </div>
+  
+  <button id="btn-upload-json">
+    <span class="material-symbols-outlined">file_json</span>
+    Nahrať JSON
+  </button>
   <input type="file" id="jsonFileInput" style="display: none;" accept=".json">
-  <button id="btn-upload-txt">Nahrať txt</button>
+
+  <button id="btn-upload-txt">
+    <span class="material-symbols-outlined">upload_file</span>
+    Nahrať TXT
+  </button>
   <input type="file" id="txtFileInput" style="display: none;" accept=".txt">
   <input type="color" id="colorPicker" style="display: none;">
   
@@ -69,6 +110,35 @@
 
 <main>
 <div id="mapContainer">
+
+  <div id="currentFloorIndicator">
+    <span id="currentFloorDisplay">Prízemie</span>
+  </div>
+
+  <button id="openModal">
+    <span class="material-symbols-outlined">
+      analytics
+      </span>
+  </button>
+  <div id="myModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <div class="chart-container">
+        <svg class="chart chart-route1" width="300" height="200"></svg>
+      </div>
+      <div class="chart-container">
+        <svg class="chart chart-route2" width="300" height="200"></svg>
+      </div>
+      <div class="chart-container">
+        <svg class="chart chart-route3" width="300" height="200"></svg>
+      </div>
+      <div class="chart-container">
+        <svg class="chart chart-route4" width="300" height="200"></svg>
+      </div>
+    </div>
+  </div>
+  
+
   <div id="zoomControls">
     <button onclick="zoomIn()">
         <span class="material-symbols-outlined">zoom_in</span>
@@ -80,6 +150,28 @@
         <span class="material-symbols-outlined">zoom_out_map</span>
     </button>
   </div>
+
+  <div id="marker-details-panel" class="details-panel" style="display: none;">
+    <h3>Detaily pozície</h3>
+    <div id="marker-details">Kliknite na bod pre zobrazenie detailov.</div>
+</div>
+
+  <div id="speedControl">
+    <button id="decreaseSpeed">
+      <span class="material-symbols-outlined">arrow_downward</span>
+    </button>
+    <span id="currentSpeed">4000 ms</span>
+    <button id="increaseSpeed">
+      <span class="material-symbols-outlined">arrow_upward</span>
+    </button>
+</div>
+
+<div class="led-container">
+  <div id="led-red" class="led red"></div>
+  <div id="led-green" class="led green"></div>
+  <div id="led-blue" class="led blue"></div>
+  <div id="led-yellow" class="led yellow"></div>
+</div>
 
   <div id="animatedPath">
     <button onclick="stepBack()">
@@ -107,6 +199,8 @@
 <footer>
 </footer>
 
-<script src="script.js"></script>
+<script type="module" src="js/main.js"></script>
+
 </body>
 </html>
+
