@@ -29,7 +29,7 @@ export function resetAnimation() {
 
 export function updateSpeedDisplay() {
     if (!config.currentSpeedDisplay) {
-        console.error("❌ currentSpeedDisplay je undefined! Skontroluj initConfig().");
+        console.error("currentSpeedDisplay je undefined! Skontroluj initConfig().");
         return;
     }
     config.currentSpeedDisplay.textContent = `${animationSpeed} ms`;
@@ -48,7 +48,7 @@ updateSpeedDisplay();
 
 export function play() {
     if (config.state.activeRoutes.length === 0) {
-        console.error("❌ Žiadna aktívna trasa nie je vybraná!");
+        console.error("Žiadna aktívna trasa nie je vybraná!");
         return;
     }
 
@@ -58,7 +58,7 @@ export function play() {
         const floorData = storage.routeData?.[routeKey]?.[config.state.currentFloor];
         
         if (!floorData || !floorData.points || floorData.points.length === 0) {
-            console.error(`⚠️ Trasa ${routeKey} nemá body na poschodí ${config.state.currentFloor}!`);
+            console.error(`Trasa ${routeKey} nemá body na poschodí ${config.state.currentFloor}!`);
             return;
         }
 
@@ -133,6 +133,6 @@ if (config.decreaseSpeedButton && config.increaseSpeedButton) {
     config.decreaseSpeedButton.addEventListener("click", () => changeSpeed(-step));
     config.increaseSpeedButton.addEventListener("click", () => changeSpeed(step));
 } else {
-    console.error("❌ decreaseSpeedButton alebo increaseSpeedButton neboli nájdené!");
+    console.error(" decreaseSpeedButton alebo increaseSpeedButton neboli nájdené!");
 }
 

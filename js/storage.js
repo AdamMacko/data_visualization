@@ -46,21 +46,21 @@ export let pointsHelpers = {
 };
 
 
-// 🔹 Funkcia na uloženie eventMarker pre konkrétny bod
+
 export function saveEventMarker(routeId, floor, marker) {
     if (!routeData[routeId] || !routeData[routeId][floor]) {
-        console.error(`❌ Trasa ${routeId} alebo poschodie ${floor} neexistuje!`);
+        console.error(` Trasa ${routeId} alebo poschodie ${floor} neexistuje!`);
         return;
     }
     routeData[routeId][floor].eventMarkers.push(marker);
 }
 
-// 🔹 Funkcia na získanie všetkých eventMarkers na trase a poschodí
+
 export function getEventMarkers(routeId, floor) {
     return routeData[routeId]?.[floor]?.eventMarkers || [];
 }
 
-// 🔹 Funkcia na získanie konkrétneho eventMarker podľa ID bodu
+
 export function getEventMarkerByPointId(routeId, floor, pointId) {
     return routeData[routeId]?.[floor]?.eventMarkers.find(m => m.id === pointId) || null;
 }

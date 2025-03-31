@@ -355,9 +355,9 @@ p {
 
 
 .led.active {
-  /* Zmeníme farbu LED po aktivácii */
-  opacity: 1; /* LED bude viditeľná */
-  box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.8); /* Zvýšenie svetla LED */
+ 
+  opacity: 1; 
+  box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.8); 
 }
 
 .led.red.active {
@@ -389,13 +389,13 @@ p {
 
 .shape-btn {
   display: flex;
-  align-items: center;  /* Zarovná ikonu a text vertikálne */
-  justify-content: flex-start; /* Ikona naľavo, text vedľa nej */
+  align-items: center; 
+  justify-content: flex-start; 
   background: var(--primary-color);
   color: white;
   border: none;
   padding: 8px 12px;
-  width: 100%; /* Tlačidlá budú rovnako široké */
+  width: 100%;
   border-radius: 6px;
   font-size: 14px;
   font-weight: bold;
@@ -409,12 +409,12 @@ p {
 
 /* Štýl pre ikonu v tlačidle */
 .shape-btn span {
-  margin-right: 10px; /* Oddeľuje ikonu od textu */
-  font-size: 18px; /* Veľkosť ikon */
+  margin-right: 10px; 
+  font-size: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px; /* Pevná šírka pre lepšie zarovnanie */
+  width: 24px; 
 }
 .shape-btn:hover span {
   color:var( --hover-span-color) ;

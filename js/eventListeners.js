@@ -7,7 +7,7 @@ import * as storage from "./storage.js";
  * Inicializácia všetkých event listenerov
  */
 export function initEventListeners() {
-    console.log("🔗 Event listenery inicializované!");
+    console.log("Event listenery inicializované!");
 // Prepínanie menu pre výber poschodia
 config.btnChangeFloor?.addEventListener("click", (event) => {
     event.stopPropagation();
@@ -21,7 +21,7 @@ document.getElementById("openModal").addEventListener("click", function() {
     // Počkaj chvíľu, kým sa modal zobrazí, a potom vykresli grafy
     setTimeout(() => {
         drawCharts();
-    }, 100); // Môžeš zmeniť hodnotu, ak sa grafy nenačítajú správne
+    }, 100); 
 });
 
 
@@ -34,30 +34,26 @@ document.getElementById("myModal").addEventListener("click", function(event) {
 // Event listener pre tlačidlá poschodí
 config.floorButtons.forEach(button => {
     button.addEventListener("click", function () {
-        // Prečítame číslo poschodia z textContent tlačidla.
+    
         let floor = parseInt(this.textContent);
-        // Aktualizujeme currentFloor v globálnom stave
+      
         config.state.currentFloor = floor;
        
-        
-        // Skryjeme menu s tlačidlami poschodí
         config.floorMenu.style.display = "none";
         
-        // Ak máte definované floorplany v routeData alebo v floorPlans,
-        // zistíme správny floorplan pre dané poschodie.
         let floorplan = null;
-        // Napríklad, ak máte aspoň jednu aktívnu trasu, skúste z nej získať floorplan:
+    
         if (config.state.activeRoutes.length > 0) {
             let activeRoute = config.state.activeRoutes[0];
             if (storage.routeData[activeRoute] && storage.routeData[activeRoute][floor] && storage.routeData[activeRoute][floor].floorplan) {
                 floorplan = storage.routeData[activeRoute][floor].floorplan;
             }
         }
-        // Ak floorplan nie je nájdený, skúste použiť manuálne uložené floorPlans
+  
         if (!floorplan) {
             floorplan = config.state.floorPlans[floor];
         }
-        // Ak ani tam nie je, použijeme predvolený obrázok
+  
         if (!floorplan) {
             floorplan = "images/background.png";
         }
@@ -65,8 +61,7 @@ config.floorButtons.forEach(button => {
         config.floorplanImage.setAttribute("href", floorplan);
         console.log(`Aktuálne poschodie nastavené na ${floor}.`);
         
-        // Ak máte funkciu setFloor, ktorá zobrazuje body podľa poschodia,
-        // môžete ju tiež zavolať a poslať state.currentFloor.
+
         if (typeof setFloor === "function") {
             setFloor(config.state.currentFloor);
         }
@@ -79,7 +74,7 @@ document.addEventListener("click", (event) => {
         config.floorMenu.style.display = "none";
     }
 });
-/** === 📌 UPLOAD MAPY === */
+/** === UPLOAD MAPY === */
 config.btnUploadMap?.addEventListener("click", () => config.map.click());
 
 config.map?.addEventListener("change", (event) => {
@@ -120,7 +115,7 @@ document.getElementById("jsonFileInput")?.addEventListener("change", (event) => 
             
             console.log("Aktívne trasy:", config.state.activeRoutes);
             
-            // Pre každú aktívnu trasu zavoláme processJSON, ak ešte dáta nie sú načítané
+
             config.state.activeRoutes.forEach(routeId => {
                 if (!storage.routeData[routeId].loaded) {
                     console.log(`Spracovávam JSON pre trasu: ${routeId}`);
@@ -131,7 +126,7 @@ document.getElementById("jsonFileInput")?.addEventListener("change", (event) => 
             });
             
         } catch (error) {
-            console.error("❌ Chyba pri parsovaní JSON:", error);
+            console.error(" Chyba pri parsovaní JSON:", error);
         }
     };
     reader.readAsText(file);
@@ -144,7 +139,7 @@ document.getElementById("jsonFileInput")?.addEventListener("change", (event) => 
 
     document.getElementById("txtFileInput")?.addEventListener("change", (event) => handleFileUpload(event, "txt"));
 
-    /** === 📌 OVLÁDACIE PRVKY === */
+    /** ===  OVLÁDACIE PRVKY === */
     config.buttons?.delete?.addEventListener("click", () => removePoint());
 
     config.buttons?.update?.addEventListener("click", (event) => {
@@ -166,12 +161,12 @@ document.getElementById("jsonFileInput")?.addEventListener("change", (event) => 
         config.buttons.add.classList.toggle("active", config.state.isAddingPoint);
     });
 
-    /** === 📌 ZMENA RÝCHLOSTI ANIMÁCIE === */
+    /** ===  ZMENA RÝCHLOSTI ANIMÁCIE === */
     if (config.decreaseSpeedButton && config.increaseSpeedButton) {
         config.decreaseSpeedButton.addEventListener("click", () => changeSpeed(-250));
         config.increaseSpeedButton.addEventListener("click", () => changeSpeed(250));
     } else {
-        console.error("❌ decreaseSpeedButton alebo increaseSpeedButton neboli nájdené!");
+        console.error(" decreaseSpeedButton alebo increaseSpeedButton neboli nájdené!");
     }
 
  
@@ -183,5 +178,5 @@ document.getElementById("jsonFileInput")?.addEventListener("change", (event) => 
     config.buttons.blue.addEventListener("click", () => toggleLED("blue"));
     config.buttons.yellow.addEventListener("click", () => toggleLED("yellow"));
 
-    console.log("✅ Event listenery boli úspešne nastavené!");
+    console.log(" Event listenery boli úspešne nastavené!");
 }

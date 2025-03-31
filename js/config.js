@@ -10,16 +10,16 @@ export function initConfig() {
     svg = d3.select("#floorplan");
     zoomGroup = svg.select("#zoomGroup");
 
-    // Inicializácia zoomu
+
     _zoom = d3.zoom()
         .scaleExtent([0.5, 5])
         .on("zoom", (event) => {
             zoomGroup.attr("transform", event.transform);
         });
 
-    svg.call(_zoom); // Aplikujeme zoom
+    svg.call(_zoom); 
 
-    console.log("✅ Config načítaný!");
+    console.log("Config načítaný!");
     pathGroup = zoomGroup.append("g").attr("id", "pathGroup");
 
     sizeSlider = document.getElementById("sizeSlider");
@@ -38,7 +38,7 @@ export function initConfig() {
     increaseSpeedButton = document.getElementById("increaseSpeed");
     map = document.getElementById("floorplan-upload");
 
-    // Inicializujeme `buttons`
+ 
     buttons = {
         add: document.getElementById("btn-add-circle"),
         update: document.getElementById("btn-update-circle"),
@@ -54,17 +54,16 @@ export function initConfig() {
         yellow: document.getElementById("led-yellow"),
     };
 
-    console.log("✅ Buttons inicializované!", buttons);
 }
 
-// Funkcia na získanie zoomu
+
 function getZoom() {
     return _zoom;
 }
 
 
 
-// ✅ **Globálny stav (state)** 
+// **Globálny stav (state)** 
 export const state = {
     isAddingPoint: false,
     isDeletingPoint: false,
@@ -81,7 +80,7 @@ export const routeMapping = {
     yellow: "route4"
 };
 
-// ✅ **Export všetkých premenných a objektov**
+
 export { 
     svg, zoomGroup, pathGroup, sizeSlider, colorPicker, mapContainer, editPointMenu,
     btnChangeFloor, floorMenu, floorButtons, currentFloorDisplay, floorplanImage, btnUploadMap,
