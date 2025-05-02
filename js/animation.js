@@ -47,6 +47,7 @@ export function changeSpeed(delta) {
 updateSpeedDisplay();
 
 export function play() {
+    
     if (config.state.activeRoutes.length === 0) {
         console.error("Žiadna aktívna trasa nie je vybraná!");
         return;

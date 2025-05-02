@@ -9,7 +9,6 @@
   --hover-span-color : green;
 }
 
-/* === resetovanie a zakladny styl === */
 body {
   margin: 0;
   height: 100vh;
@@ -19,8 +18,6 @@ body {
   background-color: #000000;
   font-family: 'Roboto', sans-serif;
 }
-
-
 
 .container {
   text-align: center;
@@ -125,6 +122,7 @@ p {
   position: relative;
   margin-left: 250px;
 }
+
 
 /* === zoom === */
 #zoomControls {
@@ -378,13 +376,13 @@ p {
 
 .shape-options {
   display: flex;
-  flex-direction: column; /* Usporiadaj tlačidlá pod seba */
-  gap: 5px; /* Medzera medzi tlačidlami */
-  align-items: stretch; /* Natiahne tlačidlá na rovnakú šírku */
+  flex-direction: column; 
+  gap: 5px; 
+  align-items: stretch; 
   padding: 5px;
   background: #a1a1a1;
   border-radius: 5px;
-  width: fit-content; /* Automatická šírka podľa obsahu */
+  width: fit-content;
 }
 
 .shape-btn {
@@ -488,3 +486,51 @@ p {
   display: block;
 }
 
+/* === Detailný modal === */
+#detailChartModal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  justify-content: center;
+  align-items: center;
+  z-index: 1001;
+}
+
+#detailChartModal .modal-content {
+  width: 90%;
+  height: 90%;
+  background: white;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 6px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.4);
+}
+
+#detailChartModal .chart-container {
+  background: #f0f0f0;
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+#detailChart {
+  width: 1000px;
+  height: 500px;
+}
+
+/* Zatvárací krížik */
+#closeDetailChart {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  font-size: 24px;
+  cursor: pointer;
+  color: black;
+}

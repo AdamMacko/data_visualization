@@ -104,6 +104,14 @@
   </button>
   <input type="file" id="txtFileInput" style="display: none;" accept=".txt">
   <input type="color" id="colorPicker" style="display: none;">
+
+  <button id="btn-export-project">
+    <span class="material-symbols-outlined">save</span>
+    Exportovať projekt</button>
+    <button id="btn-import-project">
+      <span class="material-symbols-outlined">upload_file</span>
+      Importovať projekt</button>
+      <input type="file" id="importProjectInput" accept=".json" style="display: none;">
   
 </div>
 </header>
@@ -120,6 +128,7 @@
       analytics
       </span>
   </button>
+
   <div id="myModal" class="modal">
     <div class="modal-content">
       <span class="close">&times;</span>
@@ -138,6 +147,14 @@
     </div>
   </div>
   
+  <div id="detailChartModal">
+    <div class="modal-content">
+      <span class="close" id="closeDetailChart">&times;</span>
+      <div class="chart-container">
+        <svg id="detailChart"></svg>
+      </div>
+    </div>
+  </div>
 
   <div id="zoomControls">
     <button onclick="zoomIn()">
@@ -196,6 +213,7 @@
 </div>
 </main>
 
+
 <footer>
 </footer>
 
@@ -203,4 +221,3 @@
 
 </body>
 </html>
-

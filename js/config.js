@@ -19,9 +19,7 @@ export function initConfig() {
 
     svg.call(_zoom); 
 
-    console.log("Config načítaný!");
     pathGroup = zoomGroup.append("g").attr("id", "pathGroup");
-
     sizeSlider = document.getElementById("sizeSlider");
     colorPicker = document.getElementById("colorPicker");
     mapContainer = document.getElementById("mapContainer");
@@ -53,7 +51,8 @@ export function initConfig() {
         blue: document.getElementById("led-blue"),
         yellow: document.getElementById("led-yellow"),
     };
-
+    
+    console.log("Config načítaný!");
 }
 
 
@@ -63,7 +62,7 @@ function getZoom() {
 
 
 
-// **Globálny stav (state)** 
+// Globálny stav
 export const state = {
     isAddingPoint: false,
     isDeletingPoint: false,

@@ -9,10 +9,6 @@ window.stepForward = stepForward;
 window.stepBack = stepBack;
 initEventListeners();
 
-
-
-
-
 config.svg.call(config.getZoom);
 const zoom = config.getZoom();
 window.zoomIn = function () {
@@ -99,7 +95,7 @@ function addPoint(x, y) {
     const d3Shape = d3.symbol().type(d3.symbolCircle).size(150);
 
     const path = storage.pointsHelpers[config.state.currentFloor].pointsGroup.append("path")
-        .attr("d", d3Shape()) // Začneme s kruhom
+        .attr("d", d3Shape())
         .attr("fill", "yellow") 
         .attr("stroke", "black")
         .attr("stroke-width", 1.5)
@@ -149,6 +145,7 @@ export function processJSON(data, routeId) {
         route4: "yellow"
     }[routeId] || "gray";
 
+    // ak json neobsahuje poschodia k bodom, tak vytvorime len pole velkosti poctu bodov a naplnime aktualnym poschodim
     let floors = Array.isArray(data.floor) ? data.floor : new Array(data.x_positions.length).fill(config.state.currentFloor);
 
     for (let i = 0; i < data.x_positions.length; i++) {
@@ -201,6 +198,7 @@ export function processJSON(data, routeId) {
 }
 
 export function drawCharts() {
+
     const routeColors = {
         route1: "red",
         route2: "green",
@@ -217,9 +215,13 @@ export function drawCharts() {
         }
         
         const svg = d3.select(svgElement);
-        svg.selectAll("*").remove();
-        console.log(`Vyčistil som predchádzajúci graf pre trasu: ${routeKey}`);
+        
+         svg.on("click", () => {
+         openDetailChart(routeKey);
+         });
 
+        svg.selectAll("*").remove();
+        
         let allData = [];
         Object.values(storage.routeData[routeKey]).forEach(floorData => {
             if (floorData.eventMarkers) {
@@ -232,6 +234,7 @@ export function drawCharts() {
         });
 
         console.log(`Počet akcelerometrových dát pre trasu ${routeKey}: ${allData.length}`);
+
         if (allData.length === 0) {
             console.warn(`Žiadne akcelerometer dáta pre trasu ${routeKey}`);
             return;
@@ -239,14 +242,16 @@ export function drawCharts() {
 
         const width = +svg.attr("width");
         const height = +svg.attr("height");
-        const margin = { top: 20, right: 30, bottom: 40, left: 50 };
+        const margin = { top: 20, right: 20, bottom: 40, left: 40 };
         console.log(`Nastavenie rozmerov grafu: Šírka = ${width}, Výška = ${height}`);
 
+        // vytvara casovy interval na ktorom bude vykresleny graf 
         const xScale = d3.scaleTime()
             .domain([d3.min(allData, d => d.timestamp), d3.max(allData, d => d.timestamp)])
             .range([margin.left, width - margin.right]);
         console.log(`Nastavenie X škály: Časová os od ${d3.min(allData, d => d.timestamp)} do ${d3.max(allData, d => d.timestamp)}`);
-
+        
+        //nastavenie osy Y od minimalnej po maximalnu hodnotu zrychlenia 
         const yScale = d3.scaleLinear()
             .domain([
                 d3.min(allData, d => Math.min(d.x, d.y, d.z)), 
@@ -297,7 +302,7 @@ export function drawCharts() {
 
         svg.append("g")
             .attr("transform", `translate(0,${height - margin.bottom})`)
-            .call(d3.axisBottom(xScale).tickFormat(d3.timeFormat("%H:%M:%S")));
+            .call(d3.axisBottom(xScale).tickFormat(d3.timeFormat("%M:%S, ")));
         console.log(`Kreslím os X (čas)`);
 
 
@@ -308,6 +313,64 @@ export function drawCharts() {
     });
 }
 
+export function drawDetailChart(routeKey) {
+    const svg = d3.select("#detailChart");
+    svg.selectAll("*").remove();
+
+    const routeData = storage.routeData[routeKey];
+    if (!routeData) return;
+
+    const allData = [];
+    Object.values(routeData).forEach(floorData => {
+        if (floorData?.eventMarkers) {
+            floorData.eventMarkers.forEach(marker => {
+                marker.accelerometer.forEach(a => allData.push(a));
+            });
+        }
+    });
+
+    if (allData.length === 0) {
+        svg.append("text").text("Žiadne dáta").attr("x", 50).attr("y", 50);
+        return;
+    }
+
+    const width = +svg.node().clientWidth || 1000;  // fallback
+    const height = +svg.node().clientHeight || 500;
+
+    const margin = { top: 40, right: 40, bottom: 60, left: 60 };
+
+    const x = d3.scaleTime()
+        .domain(d3.extent(allData, d => d.timestamp))
+        .range([margin.left, width - margin.right]);
+
+    const y = d3.scaleLinear()
+        .domain([
+            d3.min(allData, d => Math.min(d.x, d.y, d.z)),
+            d3.max(allData, d => Math.max(d.x, d.y, d.z))
+        ])
+        .range([height - margin.bottom, margin.top]);
+
+    const line = axis => d3.line()
+        .x(d => x(d.timestamp))
+        .y(d => y(d[axis]));
+
+    svg.append("path").datum(allData).attr("fill", "none").attr("stroke", "red").attr("stroke-width", 2).attr("d", line("x"));
+    svg.append("path").datum(allData).attr("fill", "none").attr("stroke", "green").attr("stroke-width", 2).attr("d", line("y"));
+    svg.append("path").datum(allData).attr("fill", "none").attr("stroke", "blue").attr("stroke-width", 2).attr("d", line("z"));
+
+    svg.append("g").attr("transform", `translate(0,${height - margin.bottom})`).call(d3.axisBottom(x).tickFormat(d3.timeFormat("%M:%S")));
+    svg.append("g").attr("transform", `translate(${margin.left},0)`).call(d3.axisLeft(y));
+
+    svg.append("text").attr("x", 60).attr("y", 30).text("X (červená)").style("fill", "red");
+    svg.append("text").attr("x", 160).attr("y", 30).text("Y (zelená)").style("fill", "green");
+    svg.append("text").attr("x", 260).attr("y", 30).text("Z (modrá)").style("fill", "blue");
+}
+
+
+export function openDetailChart(routeKey) {
+    document.getElementById("detailChartModal").style.display = "flex";
+    setTimeout(() => drawDetailChart(routeKey), 50); 
+}
 
 
 
@@ -316,6 +379,7 @@ export function handleFileUpload(event, fileType) {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = function (e) {
+        //obsah nahrateho suboru ako text
         const text = e.target.result;
         if (fileType === "txt") {
             processTXT(text);
@@ -333,7 +397,8 @@ function processTXT(text) {
         return;
     }
 
-    let activeRouteKey = config.state.activeRoutes[0]; // Použijeme prvú aktívnu trasu
+    // Pouzijeme prvu aktivnu trasu
+    let activeRouteKey = config.state.activeRoutes[0];  
     if (!storage.routeData.hasOwnProperty(activeRouteKey)) {
         console.error(`Neplatná trasa: ${activeRouteKey}`);
         return;
@@ -360,7 +425,7 @@ function processTXT(text) {
             localMarkerCount++;
             let pointId = `T${activeRouteKey}-${localMarkerCount}_${config.state.currentFloor}`;
             let point = selectedFloorData[config.state.currentFloor]?.points.find(p => p.id.trim() === pointId.trim());
-
+            //ak bod neexistuje na aktualnom poschodi, tak sa snazime najst na dalsom 
             if (!point && selectedFloorData[config.state.currentFloor + 1]) {
                 config.state.currentFloor++;
                 localMarkerCount = 1;
@@ -383,7 +448,7 @@ function processTXT(text) {
                 const z = parseFloat(parts[5]);
                 currentMarker.accelerometer.push({ timestamp, x, y, z });
 
-                // Uloženie akcelerometer údajov podľa poschodia
+                // Uloženie akcelerometer udajov podla poschodia
                 if (!storage.routeData[activeRouteKey].accelerometerData[config.state.currentFloor]) {
                     storage.routeData[activeRouteKey].accelerometerData[config.state.currentFloor] = [];
                 }
@@ -395,7 +460,7 @@ function processTXT(text) {
     storage.routeData[activeRouteKey][config.state.currentFloor].eventMarkers = selectedMarkerEvents;
 
     console.log(`Uložené Marker Events pre trasu ${activeRouteKey}, poschodie ${config.state.currentFloor}:`, selectedMarkerEvents);
-    console.log(` Uložené Accelerometer Data pre trasu ${activeRouteKey}, poschodie ${config.state.currentFloor}:`, storage.routeData[activeRouteKey].accelerometerData);
+    console.log(`Uložené Accelerometer Data pre trasu ${activeRouteKey}, poschodie ${config.state.currentFloor}:`, storage.routeData[activeRouteKey].accelerometerData);
 
     config.state.currentFloor = 0;
 }
@@ -428,35 +493,29 @@ window.removePoint = function() {
     if (config.state.selectedPoint.circleElement) {
         config.state.selectedPoint.circleElement.remove();
     }
+
     if (config.state.selectedPoint.textElement) {
         config.state.selectedPoint.textElement.remove();
     }
-
 
     config.state.selectedPoint = null;
 }
 
 
 function selectPoint(element, point) {
+
     if (!point || !point.id) {
         console.warn("Kliknutý bod nemá platné ID!", point);
         return;
     }
 
     const pointId = point.id.trim();
-
-
     const detailsPanel = document.getElementById("marker-details-panel");
-    if (!detailsPanel) {
-        console.error("Chýba HTML element #marker-details-panel!");
-        return;
-    }
-
-    // === Získame všetky pomocné body pre aktuálne poschodie ===
+    // Získame všetky pomocné body pre aktuálne poschodie
     const helperPoints = storage.pointsHelpers[config.state.currentFloor]?.points || {};
     const isHelperPoint = Object.values(helperPoints).some(helper => helper.id === pointId);
 
-    // === Ak je tento bod už vybraný, tak ho zrušíme ===
+    // Ak je tento bod už vybraný, tak ho zrušíme 
     if (config.state.selectedPoint?.id === pointId) {
         console.log(`Zrušenie výberu bodu: ${pointId}`);
         d3.select(element).classed("pulsating", false);
@@ -466,10 +525,10 @@ function selectPoint(element, point) {
         return;
     }
 
-    // === Odznačíme všetky ostatné body ===
+    // odznacime vsetky ostatne body
     d3.selectAll("circle").classed("pulsating", false);
 
-    // === Ak je to pomocný bod ===
+    // Ak je to pomocný bod 
     if (isHelperPoint) {
         console.log(`Bod ${pointId} je pomocný!`);
         d3.select(element).classed("pulsating", true);
@@ -483,9 +542,7 @@ function selectPoint(element, point) {
         return;
     }
 
-
     console.log("Celé routeData:", storage.routeData);
-
     let allMarkerEvents = [];
     for (const [routeName, route] of Object.entries(storage.routeData)) {
         for (const [floor, floorData] of Object.entries(route)) {
@@ -535,8 +592,8 @@ window.openColorPicker = function() {
         return;
     }
 
-    config.colorPicker.click();
-    config.colorPicker.addEventListener("input", function handler(event) {
+        config.colorPicker.click();
+        config.colorPicker.addEventListener("input", function handler(event) {
         const newColor = event.target.value;
 
         
@@ -587,13 +644,17 @@ window.openSizeInput = function() {
 }
 
 
-
 /**
  * === Prepínanie poschodí a reset animácie ===
  */
 function setFloor(floor) {
 
+    if (isNaN(floor)) {
+        console.warn("Hodnota poschodia je NaN, nastavujem na 0 (prízemie).");
+        floor = 0;
+    }
     if (!storage.pointsHelpers[floor]) return;
+
     
     resetAnimation();
 
@@ -630,7 +691,6 @@ function setFloor(floor) {
 
     config.state.currentFloor = floor;
 
-
     document.getElementById("currentFloorDisplay").textContent = 
         floor === 0 ? "Prízemie" : `${floor}. poschodie`;
 
@@ -639,13 +699,17 @@ function setFloor(floor) {
     config.state.activeRoutes.some(routeId => {
         if (storage.routeData[routeId] && storage.routeData[routeId][floor] && storage.routeData[routeId][floor].floorplan) {
             floorplan = storage.routeData[routeId][floor].floorplan;
-            return true; // našli sme
+            return true;
         }
         return false;
     });
     if (!floorplan) {
+        floorplan = config.state.floorPlans[floor];
+    }
+    if (!floorplan) {
         floorplan = "images/background.png";
     }
+    
     const floorplanImage = document.querySelector("#floorplan image");
     floorplanImage.setAttribute("href", floorplan);
 
@@ -706,6 +770,7 @@ export function toggleLED(color) {
     console.log("Farba LED:", color);
     
     const button = config.buttons[color];
+
     if (!button) {
         console.error(`Chyba: Button pre ${color} neexistuje!`);
         return;
@@ -725,11 +790,165 @@ export function toggleLED(color) {
         // Odstránime trasu z aktívnych trás
         config.state.activeRoutes = config.state.activeRoutes.filter(route => route !== routeId);
         console.log(`Odstránená trasa: ${routeId}. Aktívne trasy:`, config.state.activeRoutes);
-        
-
     }
 
     setFloor(config.state.currentFloor);
     
     console.log(`Triedy pre ${color}:`, button.classList);
+}
+
+function downloadJSON(data, filename) {
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+export function exportFullProject() {
+    // Deep clone, ale iba serializovateľné dáta
+    function cleanPoints(points) {
+        return points.map(p => {
+            const { x, y, id } = p;
+            return { x, y, id };
+        });
+    }
+
+    function cleanRouteData(routeData) {
+        const cleaned = {};
+        for (const floor in routeData) {
+            if (["loaded", "accelerometerData"].includes(floor)) {
+                cleaned[floor] = routeData[floor];
+                continue;
+            }
+
+            cleaned[floor] = {
+                floorplan: routeData[floor].floorplan,
+                points: cleanPoints(routeData[floor].points),
+                eventMarkers: routeData[floor].eventMarkers
+            };
+        }
+        cleaned.accelerometerData = routeData.accelerometerData;
+        cleaned.loaded = routeData.loaded;
+        return cleaned;
+    }
+
+    function cleanPointsHelpers(helpers) {
+        const result = {};
+        for (const floor in helpers) {
+            result[floor] = {
+                points: cleanPoints(helpers[floor].points)
+            };
+        }
+        return result;
+    }
+
+    const exportData = {
+        routes: Object.fromEntries(
+            Object.entries(storage.routeData).map(([routeId, route]) => [
+                routeId,
+                cleanRouteData(route)
+            ])
+        ),
+        manualPoints: cleanPointsHelpers(storage.pointsHelpers),
+        floorPlans: config.state.floorPlans,
+        state: {
+            currentFloor: config.state.currentFloor,
+            activeRoutes: config.state.activeRoutes
+        }
+    };
+
+    downloadJSON(exportData, "indoor_project_export.json");
+}
+
+export function importFullProject(data) {
+    if (!data || !data.routes) {
+        console.error("Neplatný formát projektu.");
+        return;
+    }
+
+    // Reset aktuálnych dát
+    config.pathGroup.selectAll("*").remove();
+    config.state.selectedPoint = null;
+    config.state.isAddingPoint = false;
+    config.state.isDeletingPoint = false;
+
+    // Obnova dát
+    Object.assign(storage.routeData, data.routes);
+    Object.assign(storage.pointsHelpers, data.manualPoints);
+    config.state.floorPlans = data.floorPlans;
+    config.state.currentFloor = data.state.currentFloor || 0;
+    config.state.activeRoutes = data.state.activeRoutes || [];
+
+    // Prekresli všetko
+    Object.entries(storage.routeData).forEach(([routeId, route]) => {
+        for (let floor = 0; floor <= 4; floor++) {
+            if (route[floor]?.points?.length > 0) {
+                if (!route[floor].pointsGroup) {
+                    route[floor].pointsGroup = config.zoomGroup.append("g")
+                        .attr("class", `points-group-floor-${floor}-${routeId}`);
+                }
+                route[floor].points.forEach((point, index) => {
+                    const circle = route[floor].pointsGroup.append("circle")
+                        .attr("cx", point.x)
+                        .attr("cy", point.y)
+                        .attr("r", 5)
+                        .attr("fill", routeId === "route1" ? "red" :
+                                        routeId === "route2" ? "lime" :
+                                        routeId === "route3" ? "blue" : "yellow")
+                        .attr("class", "point")
+                        .datum(point)
+                        .on("click", function (event) {
+                            event.stopPropagation();
+                            config.state.isDeletingPoint ? removePoint(this, point) : selectPoint(this, point);
+                        });
+
+                    const text = route[floor].pointsGroup.append("text")
+                        .attr("x", point.x - 3.5)
+                        .attr("y", point.y + 4)
+                        .text(index + 1)
+                        .style("fill", "white")
+                        .style("font-size", "12px")
+                        .style("pointer-events", "none");
+
+                    point.circleElement = circle;
+                    point.textElement = text;
+                });
+            }
+        }
+    });
+
+    Object.entries(storage.pointsHelpers).forEach(([floor, helper]) => {
+        if (!helper.pointsGroup) {
+            helper.pointsGroup = config.zoomGroup.append("g")
+                .attr("class", `manual-points-group-${floor}`);
+        }
+
+        helper.points.forEach(point => {
+            const d3Shape = d3.symbol().type(d3.symbolCircle).size(150);
+            const path = helper.pointsGroup.append("path")
+                .attr("d", d3Shape())
+                .attr("fill", "yellow")
+                .attr("stroke", "black")
+                .attr("stroke-width", 1.5)
+                .attr("class", "manual-point")
+                .style("cursor", "pointer")
+                .datum(point)
+                .attr("transform", `translate(${point.x},${point.y})`)
+                .on("click", function (event) {
+                    event.stopPropagation();
+                    if (config.state.isDeletingPoint) {
+                        removePoint(this, point);
+                    } else {
+                        selectPoint(this, point);
+                    }
+                });
+
+            point.circleElement = path;
+        });
+    });
+
+    setFloor(config.state.currentFloor);
 }

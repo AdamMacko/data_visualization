@@ -1,5 +1,5 @@
 import * as config from "./config.js";
-import { processJSON ,handleFileUpload,toggleLED,drawCharts,handleSizeChange} from "./main.js"; 
+import { processJSON ,handleFileUpload,toggleLED,drawCharts,handleSizeChange,exportFullProject,importFullProject} from "./main.js"; 
 import { changeSpeed } from "./animation.js";
 import * as storage from "./storage.js";
 
@@ -14,6 +14,40 @@ config.btnChangeFloor?.addEventListener("click", (event) => {
     config.floorMenu.style.display =
         (config.floorMenu.style.display === "block") ? "none" : "block";
 });
+
+document.getElementById("btn-export-project")?.addEventListener("click", () => {
+    const confirmed = confirm("Chceš exportovať celý projekt vrátane trás, bodov a floorplanov?");
+    if (confirmed) {
+        exportFullProject();
+    }
+});
+
+document.getElementById("closeDetailChart").addEventListener("click", () => {
+    document.getElementById("detailChartModal").style.display = "none";
+  });
+  
+
+document.getElementById("btn-import-project")?.addEventListener("click", () => {
+    document.getElementById("importProjectInput").click();
+});
+
+document.getElementById("importProjectInput")?.addEventListener("change", (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const jsonData = JSON.parse(e.target.result);
+            importFullProject(jsonData);
+            alert("Projekt bol úspešne importovaný.");
+        } catch (err) {
+            alert("Chyba pri načítaní súboru: " + err.message);
+        }
+    };
+    reader.readAsText(file);
+});
+
 
 document.getElementById("openModal").addEventListener("click", function() {
     document.getElementById("myModal").style.display = "flex";
@@ -82,10 +116,18 @@ config.map?.addEventListener("change", (event) => {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (e) => {
+        // Uloženie nahratého podorysu pre aktuálne poschodie
+        const currentFloor = config.state.currentFloor;
+       
+
+        config.state.floorPlans[currentFloor] = e.target.result;
+        console.log('Uložený podorys pre prízemie:', config.state.floorPlans[0]);
+        // Nastavenie podorysu na zobrazenie
         config.floorplanImage.setAttribute("href", e.target.result);
     };
     reader.readAsDataURL(file);
 });
+
 
 
 document.getElementById("btn-upload-json")?.addEventListener("click", () => {
