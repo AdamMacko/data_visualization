@@ -1,4 +1,5 @@
-import * as config from "./config.js";
+import * as config from "./config.js"; 
+
 config.initConfig();
 import { initEventListeners } from "./eventListeners.js";
 import { play, stop, stepForward, stepBack,resetAnimation } from "./animation.js";
@@ -7,7 +8,6 @@ window.play = play;
 window.stop = stop;
 window.stepForward = stepForward;
 window.stepBack = stepBack;
-initEventListeners();
 
 config.svg.call(config.getZoom);
 const zoom = config.getZoom();
@@ -22,22 +22,53 @@ window.zoomOut = function () {
 window.resetZoom = function () {
     config.svg.transition().call(zoom.transform, d3.zoomIdentity);
 };
-
 /**
- * === Pridávanie bodov ===
+ * === Pridávanie bodov/ Presuvanie ===
  */
 config.svg.on("click", (event) => {
     const transform = d3.zoomTransform(config.svg.node());
     const [mouseX, mouseY] = d3.pointer(event, config.svg.node());
-    
+
     const x = (mouseX - transform.x) / transform.k;
     const y = (mouseY - transform.y) / transform.k;
-    
+
     if (config.state.isAddingPoint) {
         addPoint(x, y);
+        config.state.isAddingPoint = false;
+    
+        if (config.buttons.add) {
+            config.buttons.add.innerHTML = `<span class="material-symbols-outlined">add</span> Pridať bod`;
+            config.buttons.add.classList.remove("active");
+        }
+    
+        return;
+    }
+    
+
+    if (config.state.isMovingPoint && config.state.selectedPoint) {
+        const point = config.state.selectedPoint;
+        point.x = x;
+        point.y = y;
+
+        const element = point.circleElement.node();
+
+        if (element.tagName === "circle") {
+            d3.select(element).attr("cx", x).attr("cy", y);
+        } else if (element.tagName === "path") {
+            d3.select(element).attr("transform", `translate(${x},${y})`);
+        }
+
+        if (point.textElement) {
+            d3.select(point.textElement).attr("x", x - 3.5).attr("y", y + 4);
+        }
+
+        config.state.isMovingPoint = false;
+        alert(`Bod ${point.id} bol presunutý.`);
+        return;
     }
 });
 
+  
  window.toggleShapeMenu = function() {
     config.menu.style.display = config.menu.style.display === "flex" ? "none" : "flex";
 }
@@ -78,7 +109,7 @@ config.svg.on("click", (event) => {
 
 
 
-function addPoint(x, y) {
+export function addPoint(x, y) {
     if (!storage.pointsHelpers[config.state.currentFloor]) return;
 
     if (!storage.pointsHelpers[config.state.currentFloor].pointsGroup) {
@@ -117,6 +148,7 @@ function addPoint(x, y) {
 }
 
 
+
 export function processJSON(data, routeId) {
     if (!data || !data.x_positions || !data.y_positions) {
         console.error("Neplatný JSON formát alebo chýbajú potrebné dáta.");
@@ -128,12 +160,25 @@ export function processJSON(data, routeId) {
         return;
     }
 
-    const svgWidth = 1100;
-    const svgHeight = 600;
+    const svgWidth = 1100; 
+    const svgHeight = 600; 
+
+
+    const minX = Math.min(...data.x_positions);
     const maxX = Math.max(...data.x_positions);
+    const minY = Math.min(...data.y_positions);
     const maxY = Math.max(...data.y_positions);
-    const scaleX = svgWidth / maxX;
-    const scaleY = svgHeight / maxY;
+
+
+    const scaleX = svgWidth / (maxX - minX); 
+    const scaleY = svgHeight / (maxY - minY);
+
+
+    const scale = Math.min(scaleX, scaleY);   
+
+
+    const offsetX = (svgWidth - (maxX - minX) * scale) / 2;
+    const offsetY = (svgHeight - (maxY - minY) * scale) / 2;
 
     let selectedRouteData = storage.routeData[routeId] || {};
     storage.routeData[routeId] = selectedRouteData;
@@ -145,17 +190,17 @@ export function processJSON(data, routeId) {
         route4: "yellow"
     }[routeId] || "gray";
 
-    // ak json neobsahuje poschodia k bodom, tak vytvorime len pole velkosti poctu bodov a naplnime aktualnym poschodim
-    let floors = Array.isArray(data.floor) ? data.floor : new Array(data.x_positions.length).fill(config.state.currentFloor);
+    let floors = Array.isArray(data.floor)
+        ? data.floor
+        : new Array(data.x_positions.length).fill(config.state.currentFloor);
 
     for (let i = 0; i < data.x_positions.length; i++) {
-        let x = data.x_positions[i] * scaleX;
-        let y = data.y_positions[i] * scaleY;
+        let x = (data.x_positions[i] - minX) * scale + offsetX;
+        let y = (data.y_positions[i] - minY) * scale + offsetY;
         let floor = floors[i];
 
         if (!selectedRouteData[floor]) {
-            console.log(`Vytváram objekt pre poschodie ${floor} v trase ${routeId}`);
-            selectedRouteData[floor] = { pointsGroup: null, floorplan: null, points: [] };
+            selectedRouteData[floor] = { pointsGroup: null, points: [] };
         }
 
         if (!selectedRouteData[floor].pointsGroup) {
@@ -196,6 +241,7 @@ export function processJSON(data, routeId) {
     storage.routeData[routeId].loaded = true;
     setFloor(config.state.currentFloor);
 }
+  
 
 export function drawCharts() {
 
@@ -808,7 +854,7 @@ function downloadJSON(data, filename) {
 }
 
 export function exportFullProject() {
-    // Deep clone, ale iba serializovateľné dáta
+
     function cleanPoints(points) {
         return points.map(p => {
             const { x, y, id } = p;
@@ -869,20 +915,18 @@ export function importFullProject(data) {
         return;
     }
 
-    // Reset aktuálnych dát
+
     config.pathGroup.selectAll("*").remove();
     config.state.selectedPoint = null;
     config.state.isAddingPoint = false;
     config.state.isDeletingPoint = false;
 
-    // Obnova dát
     Object.assign(storage.routeData, data.routes);
     Object.assign(storage.pointsHelpers, data.manualPoints);
     config.state.floorPlans = data.floorPlans;
     config.state.currentFloor = data.state.currentFloor || 0;
     config.state.activeRoutes = data.state.activeRoutes || [];
 
-    // Prekresli všetko
     Object.entries(storage.routeData).forEach(([routeId, route]) => {
         for (let floor = 0; floor <= 4; floor++) {
             if (route[floor]?.points?.length > 0) {
@@ -952,3 +996,7 @@ export function importFullProject(data) {
 
     setFloor(config.state.currentFloor);
 }
+
+window.addEventListener("DOMContentLoaded", () => {
+    initEventListeners();
+  });   

@@ -35,7 +35,6 @@ export function initConfig() {
     decreaseSpeedButton = document.getElementById("decreaseSpeed");
     increaseSpeedButton = document.getElementById("increaseSpeed");
     map = document.getElementById("floorplan-upload");
-
  
     buttons = {
         add: document.getElementById("btn-add-circle"),
@@ -66,6 +65,7 @@ function getZoom() {
 export const state = {
     isAddingPoint: false,
     isDeletingPoint: false,
+    isMovingPoint: false,
     selectedPoint: null,
     currentFloor: 0,
     activeRoutes: [],
@@ -84,5 +84,5 @@ export {
     svg, zoomGroup, pathGroup, sizeSlider, colorPicker, mapContainer, editPointMenu,
     btnChangeFloor, floorMenu, floorButtons, currentFloorDisplay, floorplanImage, btnUploadMap,
     menu, currentSpeedDisplay, decreaseSpeedButton, increaseSpeedButton, buttons, map,
-    getZoom
+    getZoom,           
 };

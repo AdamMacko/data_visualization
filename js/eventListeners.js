@@ -1,5 +1,5 @@
 import * as config from "./config.js";
-import { processJSON ,handleFileUpload,toggleLED,drawCharts,handleSizeChange,exportFullProject,importFullProject} from "./main.js"; 
+import { processJSON ,handleFileUpload,toggleLED,drawCharts,handleSizeChange,exportFullProject,importFullProject,addPoint} from "./main.js"; 
 import { changeSpeed } from "./animation.js";
 import * as storage from "./storage.js";
 
@@ -7,8 +7,13 @@ import * as storage from "./storage.js";
  * Inicializácia všetkých event listenerov
  */
 export function initEventListeners() {
+
     console.log("Event listenery inicializované!");
-// Prepínanie menu pre výber poschodia
+    document.getElementById("btn-step-back")?.addEventListener("click", () => window.stepBack?.());
+    document.getElementById("btn-step-forward")?.addEventListener("click", () => window.stepForward?.());
+    document.getElementById("btn-stop")?.addEventListener("click", () => window.stop?.());
+    document.getElementById("btn-play")?.addEventListener("click", () => window.play?.());
+
 config.btnChangeFloor?.addEventListener("click", (event) => {
     event.stopPropagation();
     config.floorMenu.style.display =
@@ -128,6 +133,16 @@ config.map?.addEventListener("change", (event) => {
     reader.readAsDataURL(file);
 });
 
+document.querySelector("#edit-point-menu button:nth-child(6)")?.addEventListener("click", () => {
+    if (!config.state.selectedPoint) {
+        alert("Najskôr vyberte bod, ktorý chcete presunúť!");
+        return;
+    }
+
+    config.state.isMovingPoint = true;
+    alert("Režim presúvania bodu: kliknite na nové miesto v mape.");
+});
+
 
 
 document.getElementById("btn-upload-json")?.addEventListener("click", () => {
@@ -203,6 +218,8 @@ document.getElementById("jsonFileInput")?.addEventListener("change", (event) => 
         config.buttons.add.classList.toggle("active", config.state.isAddingPoint);
     });
 
+  
+
     /** ===  ZMENA RÝCHLOSTI ANIMÁCIE === */
     if (config.decreaseSpeedButton && config.increaseSpeedButton) {
         config.decreaseSpeedButton.addEventListener("click", () => changeSpeed(-250));
@@ -210,11 +227,7 @@ document.getElementById("jsonFileInput")?.addEventListener("change", (event) => 
     } else {
         console.error(" decreaseSpeedButton alebo increaseSpeedButton neboli nájdené!");
     }
-
- 
-
     config.sizeSlider?.addEventListener("input", handleSizeChange);
-
     config.buttons.red.addEventListener("click", () => toggleLED("red"));
     config.buttons.green.addEventListener("click", () => toggleLED("green"));
     config.buttons.blue.addEventListener("click", () => toggleLED("blue"));

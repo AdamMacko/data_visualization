@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>App</title>
+  <title>IndoorTraVis</title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
@@ -77,20 +77,7 @@
     Nahrať pôdorys
   </button>
   <input type="file" id="floorplan-upload" accept="image/*" style="display: none;">
-  
-  <button id="btn-change-floor">  
-    <span class="material-symbols-outlined">layers</span>
-    Zmeniť poschodie
-  </button>
-  
-  <!-- Dropdown menu na výber poschodia -->
-  <div id="floor-menu" class="dropdown-menu" style="display: none;">
-    <button class="dropdown-item" onclick="setFloor(0)">Prízemie</button>
-    <button class="dropdown-item" onclick="setFloor(1)">1. poschodie</button>
-    <button class="dropdown-item" onclick="setFloor(2)">2. poschodie</button>
-    <button class="dropdown-item" onclick="setFloor(3)">3. poschodie</button>
-    <button class="dropdown-item" onclick="setFloor(4)">4. poschodie</button>
-  </div>
+
   
   <button id="btn-upload-json">
     <span class="material-symbols-outlined">file_json</span>
@@ -147,14 +134,15 @@
     </div>
   </div>
   
-  <div id="detailChartModal">
-    <div class="modal-content">
-      <span class="close" id="closeDetailChart">&times;</span>
-      <div class="chart-container">
-        <svg id="detailChart"></svg>
-      </div>
+<div id="detailChartModal" class="modal">
+  <div class="modal-content">
+    <span class="close" id="closeDetailChart">&times;</span>
+    <div class="chart-container">
+      <svg id="detailChart"></svg>
     </div>
   </div>
+</div>
+
 
   <div id="zoomControls">
     <button onclick="zoomIn()">
@@ -165,6 +153,29 @@
     </button>
     <button onclick="resetZoom()">
         <span class="material-symbols-outlined">zoom_out_map</span>
+    </button>
+  </div>
+
+  <div id ="stage">
+    <button onclick="setFloor(0)"><span class="material-symbols-outlined">
+      counter_0
+      </span></button>
+    <button onclick="setFloor(1)">
+      <span class="material-symbols-outlined">
+        counter_1
+        </span>
+      </button>
+    <button onclick="setFloor(2)">
+      <span class="material-symbols-outlined">
+        counter_2
+        </span>
+    </button>
+    <button onclick="setFloor(3)"><span class="material-symbols-outlined">
+      counter_3
+      </span></button>
+    <button onclick="setFloor(4)"><span class="material-symbols-outlined">
+      counter_4
+      </span>
     </button>
   </div>
 
@@ -204,8 +215,8 @@
       <span class="material-symbols-outlined">arrow_forward</span>
     </button>
   </div>
-
-  <svg id="floorplan" width="1100" height="600">
+  
+  <svg id="floorplan" width="1100" height="600" viewBox="0 0 1100 600">
     <g id="zoomGroup">
       <image href="images/background.png" x="0" y="0" width="1100" height="600" preserveAspectRatio="none"></image>
     </g>

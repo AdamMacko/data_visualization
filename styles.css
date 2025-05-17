@@ -124,6 +124,7 @@ p {
 }
 
 
+
 /* === zoom === */
 #zoomControls {
   position: absolute;
@@ -248,7 +249,7 @@ p {
   left: 50%;
   transform: translateX(-50%);
   background: linear-gradient(135deg, #7c7c7c, #898989);
-  color: #067bf8;
+  color: #ffffff;
   padding: 12px 20px;
   border-radius: 12px;
   font-size: 20px;
@@ -525,7 +526,6 @@ p {
   height: 500px;
 }
 
-/* Zatvárací krížik */
 #closeDetailChart {
   position: absolute;
   top: 10px;
@@ -533,4 +533,34 @@ p {
   font-size: 24px;
   cursor: pointer;
   color: black;
+}
+
+
+#stage {
+  position: absolute;
+  bottom: 1;
+  right: 1105px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 6px;
+  background-color: rgba(175, 175, 175, 0.7);
+  border-radius: 5px;
+}
+
+#stage button {
+  background-color: var(--primary-color);
+  color: var(--text-light);
+  border: none;
+  padding: 8px;
+  border-radius: var(--button-radius);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#stage button:hover {
+  background-color: var(--primary-hover);
+}
+#stage button:hover span {
+  color:var( --hover-span-color) ;
 }
